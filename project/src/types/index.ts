@@ -25,7 +25,8 @@ export interface Assignment {
   id: string;
   title: string;
   description: string;
-  type: 'code' | 'scratch';
+  type: 'code' | 'scratch' | 'link'; // ✅ Add 'link'
+  url?: string; // ✅ Allow 'url' for 'link' type assignments
   language?: string;
   initialCode?: string;
   dueDate: string;

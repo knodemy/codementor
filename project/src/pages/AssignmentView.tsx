@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { programs } from "../data/mockData";
 import { Assignment } from "../types";
 import CodeEditor from "../components/CodeEditor";
-import ScratchEditor from "../components/ScratchEditor";
 import { Calendar } from "lucide-react";
 
 export default function AssignmentView() {
@@ -12,12 +11,12 @@ export default function AssignmentView() {
   const [code, setCode] = useState<string>("");
   const [output, setOutput] = useState<string>("");
   const [pyodide, setPyodide] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Load Pyodide
   useEffect(() => {
-    const loadPyodide = async () => {
-      if (!window.loadPyodide) {
-        console.error("Pyodide is not loaded");
+    const loadPyodideInstance = async () => {
+      if (typeof window.loadPyodide !== "function") {
+        console.error("Pyodide is not available.");
         return;
       }
       try {
@@ -29,7 +28,7 @@ export default function AssignmentView() {
         console.error("Failed to load Pyodide:", error);
       }
     };
-    loadPyodide();
+    loadPyodideInstance();
   }, []);
 
   const classItem = programs
@@ -47,31 +46,39 @@ export default function AssignmentView() {
     }
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile) {
+      console.log("File submitted:", selectedFile.name);
+      alert("File submitted successfully!");
+      setSelectedFile(null);
+    }
+  };
+
   const runCode = async () => {
     if (!pyodide) {
       setOutput("Pyodide is still loading...");
       return;
     }
     try {
-      // Redirect stdout to capture `print()` output
       pyodide.runPython(`
-  import sys
-  from io import StringIO
-  sys.stdout = StringIO()
-  `);
-  
-      // Run the user's code
+        import sys
+        from io import StringIO
+        sys.stdout = StringIO()
+      `);
       await pyodide.runPythonAsync(code);
-  
-      // Get the captured output
       const capturedOutput = pyodide.runPython("sys.stdout.getvalue()");
-  
       setOutput(capturedOutput || "No output");
     } catch (error: any) {
       setOutput(`Error: ${error.message}`);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -128,9 +135,29 @@ export default function AssignmentView() {
                       <pre className="text-gray-800">{output}</pre>
                     </div>
                   </div>
-                ) : (
-                  <ScratchEditor description={selectedAssignment.description} />
-                )}
+                ) : selectedAssignment.type === "link" ? (
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Scratch Editor</h3>
+                    <a
+                      href={selectedAssignment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      Open Scratch Editor
+                    </a>
+                  </div>
+                ) : null}
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Submit Your Work</h3>
+                  <input type="file" onChange={handleFileChange} className="mb-2" />
+                  <button
+                    onClick={handleSubmit}
+                    className="px-4 py-2 bg-green-500 text-white rounded mt-2"
+                  >
+                    Submit Work
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="bg-white p-6 rounded-lg shadow-sm">

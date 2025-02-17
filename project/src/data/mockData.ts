@@ -31,34 +31,18 @@ export const programs: Program[] = [
                 id: 'a2',
                 title: 'Basic Animation',
                 description: 'Create a simple animation of a cat moving across the screen using Scratch blocks.',
-                type: 'scratch',
+                type: 'link',
+                url: 'https://scratch.mit.edu/projects/editor/',
                 dueDate: '2024-04-20'
-              }
-            ]
-          },
-          {
-            id: 'cs102',
-            name: 'Data Structures',
-            instructor: 'Prof. James Wilson',
-            meetingLink: 'https://meet.google.com/klm-nop-qrs',
-            description: 'Advanced data structures and algorithms',
-            assignments: [
-              {
-                id: 'a3',
-                title: 'Linked List Implementation',
-                description: 'Implement a doubly linked list in C++ with basic operations.',
-                type: 'code',
-                language: 'cpp',
-                initialCode: 'class Node {\n  // Your code here\n};\n\nclass LinkedList {\n  // Your code here\n};',
-                dueDate: '2024-04-25'
               }
             ]
           }
         ]
       }
     ]
-  },
-  {
+  }, 
+
+  { // Second object starts correctly
     id: '2',
     name: 'Business Management',
     description: 'Learn essential business skills and management principles',
